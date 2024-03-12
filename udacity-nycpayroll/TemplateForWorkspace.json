@@ -24,6 +24,10 @@
 			"type": "string",
 			"defaultValue": "https://udacitynycpayrollthomasm.dfs.core.windows.net/"
 		},
+		"ls_data_lake_gen2_DEDICATED_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://udacitynycpayrollthomasm.dfs.core.windows.net/"
+		},
 		"udacity-nycpayroll-WorkspaceDefaultStorage_properties_typeProperties_url": {
 			"type": "string",
 			"defaultValue": "https://udacitynycforsynapse.dfs.core.windows.net"
@@ -65,6 +69,25 @@
 						"type": "SecureString",
 						"value": "[parameters('ls_data_lake_gen2_accountKey')]"
 					}
+				},
+				"connectVia": {
+					"referenceName": "AutoResolveIntegrationRuntime",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/integrationRuntimes/AutoResolveIntegrationRuntime')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/ls_data_lake_gen2_DEDICATED')]",
+			"type": "Microsoft.Synapse/workspaces/linkedServices",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"annotations": [],
+				"type": "AzureBlobFS",
+				"typeProperties": {
+					"url": "[parameters('ls_data_lake_gen2_DEDICATED_properties_typeProperties_url')]"
 				},
 				"connectVia": {
 					"referenceName": "AutoResolveIntegrationRuntime",
@@ -144,6 +167,26 @@
 			"properties": {
 				"type": "ManagedIdentity",
 				"typeProperties": {}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/Automatic_generated_script')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"content": {
+					"query": "IF NOT EXISTS (SELECT * FROM sys.external_file_formats WHERE name = 'SynapseParquetFormat') \n\tCREATE EXTERNAL FILE FORMAT [SynapseParquetFormat] \n\tWITH ( FORMAT_TYPE = PARQUET)\nGO\n\nIF NOT EXISTS (SELECT * FROM sys.external_data_sources WHERE name = 'udacity-nycpayroll-thomas-m_udacitynycpayrollthomasm_dfs_core_windows_net') \n\tCREATE EXTERNAL DATA SOURCE [udacity-nycpayroll-thomas-m_udacitynycpayrollthomasm_dfs_core_windows_net] \n\tWITH (\n\t\tLOCATION = 'abfss://udacity-nycpayroll-thomas-m@udacitynycpayrollthomasm.dfs.core.windows.net' \n\t)\nGO\n\nCREATE EXTERNAL TABLE nyc_result (\n\t[AgencyName] nvarchar(4000),\n\t[FiscalYear] int,\n\t[TotalPaid] float\n\t)\n\tWITH (\n\tLOCATION = 'dirstaging',\n\tDATA_SOURCE = [udacity-nycpayroll-thomas-m_udacitynycpayrollthomasm_dfs_core_windows_net],\n\tFILE_FORMAT = [SynapseParquetFormat]\n\t)\nGO\n",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"databaseName": "udacity",
+						"poolName": "Built-in"
+					},
+					"resultLimit": 5000
+				},
+				"type": "SqlQuery"
 			},
 			"dependsOn": []
 		},
@@ -228,18 +271,38 @@
 			"dependsOn": []
 		},
 		{
-			"name": "[concat(parameters('workspaceName'), '/Do all on DEDICATED')]",
+			"name": "[concat(parameters('workspaceName'), '/Do all on DEDICATED_OBSOLETE')]",
 			"type": "Microsoft.Synapse/workspaces/sqlscripts",
 			"apiVersion": "2019-06-01-preview",
 			"properties": {
 				"content": {
-					"query": "-- All steps for dedicated SQL pool\n\n\n-- USE udacitytemp\n-- GO\n\n-- Use the same file format as used for creating the External Tables during the LOAD step.\nIF NOT EXISTS (SELECT * FROM sys.external_file_formats WHERE name = 'SynapseDelimitedTextFormat') \nCREATE EXTERNAL FILE FORMAT [SynapseDelimitedTextFormat] \nWITH ( FORMAT_TYPE = DELIMITEDTEXT ,\nFORMAT_OPTIONS (\nFIELD_TERMINATOR = ',',\nUSE_TYPE_DEFAULT = FALSE\n))\nGO\n\n-- Create master key\nDROP EXTERNAL DATA SOURCE [NYC_Payroll_Summary_DEDICATED]\nGO\nDROP DATABASE SCOPED CREDENTIAL nyc_payroll\nGO\nDROP MASTER KEY \nGO\nCREATE MASTER KEY ENCRYPTION BY PASSWORD = 'udacity_pw_001'\n\nCREATE DATABASE SCOPED CREDENTIAL nyc_payroll_DEDICATED\nWITH IDENTITY = 'SHARED ACCESS SIGNATURE',\nSECRET = 'sp=r&st=2024-03-12T16:36:20Z&se=2024-03-13T00:36:20Z&spr=https&sv=2022-11-02&sr=c&sig=hRJ1EgNHRhwC64nGaALIJo9p4GUUxuNnqfybM6lYuxU%3D'\nGO\n\nCREATE EXTERNAL DATA SOURCE [NYC_Payroll_Summary_DEDICATED] WITH\n(\n\tLOCATION = 'https://udacitynycpayrollthomasm.blob.core.windows.net/udacity-nycpayroll-thomas-m',\n\tCREDENTIAL = nyc_payroll_DEDICATED\n)\n\nCREATE EXTERNAL TABLE [dbo].[NYC_Payroll_Summary_DEDICATED](\n    [FiscalYear] [int] NULL,\n    [AgencyName] [varchar](50) NULL,\n    [TotalPaid] [float] NULL\n)\nWITH (\n    LOCATION = '/dirstaging',\n    DATA_SOURCE = [NYC_Payroll_Summary_DEDICATED],\n    FILE_FORMAT = [SynapseDelimitedTextFormat]\n    )\nGO",
+					"query": "-- All steps for dedicated SQL pool\n\n\n-- USE udacitytemp\n-- GO\n\n-- Use the same file format as used for creating the External Tables during the LOAD step.\n-- IF NOT EXISTS (SELECT * FROM sys.external_file_formats WHERE name = 'SynapseDelimitedTextFormat') \n-- CREATE EXTERNAL FILE FORMAT [SynapseDelimitedTextFormat] \n-- WITH ( FORMAT_TYPE = DELIMITEDTEXT ,\n-- FORMAT_OPTIONS (\n-- FIELD_TERMINATOR = ',',\n-- USE_TYPE_DEFAULT = FALSE\n-- ))\n-- GO\n\n-- Create master key\n-- DROP EXTERNAL DATA SOURCE [NYC_Payroll_Summary_DEDICATED]\n-- GO\n-- DROP DATABASE SCOPED CREDENTIAL nyc_payroll\n-- GO\n-- DROP MASTER KEY \n-- GO\n-- CREATE MASTER KEY ENCRYPTION BY PASSWORD = 'udacity_pw_001'\n\n-- CREATE DATABASE SCOPED CREDENTIAL nyc_payroll_DEDICATED\n-- WITH IDENTITY = 'SHARED ACCESS SIGNATURE',\n-- SECRET = 'sp=r&st=2024-03-12T16:36:20Z&se=2024-03-13T00:36:20Z&spr=https&sv=2022-11-02&sr=c&sig=hRJ1EgNHRhwC64nGaALIJo9p4GUUxuNnqfybM6lYuxU%3D'\n-- GO\n\n-- The above seems to have worked, but the following results in:\n-- \"External access operation failed because the location URI is invalid. Revise the URI and try again.\"\n\nDROP EXTERNAL DATA SOURCE [NYC_Payroll_Summary_DEDICATED]\nGO\nCREATE EXTERNAL DATA SOURCE [NYC_Payroll_Summary_DEDICATED] WITH\n(\n\tLOCATION = 'https://udacitynycpayrollthomasm.blob.core.windows.net/udacity-nycpayroll-thomas-m',\n    https://udacitynycpayrollthomasm.blob.core.windows.net/udacity-nycpayroll-thomas-m\n\tCREDENTIAL = nyc_payroll_DEDICATED\n)\n\nCREATE EXTERNAL TABLE [dbo].[NYC_Payroll_Summary_DEDICATED](\n    [FiscalYear] [int] NULL,\n    [AgencyName] [varchar](50) NULL,\n    [TotalPaid] [float] NULL\n)\nWITH (\n    LOCATION = '/dirstaging',\n    DATA_SOURCE = [NYC_Payroll_Summary_DEDICATED],\n    FILE_FORMAT = [SynapseDelimitedTextFormat]\n    )\nGO",
 					"metadata": {
 						"language": "sql"
 					},
 					"currentConnection": {
 						"databaseName": "udacitytemp",
 						"poolName": "udacitytemp"
+					},
+					"resultLimit": 5000
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/SQL script 1')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"content": {
+					"query": "\n\nSELECT TOP 100 * FROM nyc_result\nGO",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"databaseName": "udacity",
+						"poolName": "Built-in"
 					},
 					"resultLimit": 5000
 				},

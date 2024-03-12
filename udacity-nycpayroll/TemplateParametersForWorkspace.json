@@ -17,6 +17,9 @@
 		"ls_data_lake_gen2_properties_typeProperties_url": {
 			"value": "https://udacitynycpayrollthomasm.dfs.core.windows.net/"
 		},
+		"ls_data_lake_gen2_DEDICATED_properties_typeProperties_url": {
+			"value": "https://udacitynycpayrollthomasm.dfs.core.windows.net/"
+		},
 		"udacity-nycpayroll-WorkspaceDefaultStorage_properties_typeProperties_url": {
 			"value": "https://udacitynycforsynapse.dfs.core.windows.net"
 		}
