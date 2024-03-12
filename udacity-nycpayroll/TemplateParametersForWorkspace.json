@@ -1,0 +1,24 @@
+{
+	"$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"workspaceName": {
+			"value": "udacity-nycpayroll"
+		},
+		"ls_azure_sql_server_connectionString": {
+			"value": ""
+		},
+		"ls_data_lake_gen2_accountKey": {
+			"value": ""
+		},
+		"udacity-nycpayroll-WorkspaceDefaultSqlServer_connectionString": {
+			"value": "Integrated Security=False;Encrypt=True;Connection Timeout=30;Data Source=tcp:udacity-nycpayroll.sql.azuresynapse.net,1433;Initial Catalog=@{linkedService().DBName}"
+		},
+		"ls_data_lake_gen2_properties_typeProperties_url": {
+			"value": "https://udacitynycpayrollthomasm.dfs.core.windows.net/"
+		},
+		"udacity-nycpayroll-WorkspaceDefaultStorage_properties_typeProperties_url": {
+			"value": "https://udacitynycforsynapse.dfs.core.windows.net"
+		}
+	}
+}
