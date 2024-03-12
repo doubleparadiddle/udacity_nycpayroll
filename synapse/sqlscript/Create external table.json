@@ -1,5 +1,5 @@
 {
-	"name": "Automatic_generated_script",
+	"name": "Create external table",
 	"properties": {
 		"content": {
 			"query": "IF NOT EXISTS (SELECT * FROM sys.external_file_formats WHERE name = 'SynapseParquetFormat') \n\tCREATE EXTERNAL FILE FORMAT [SynapseParquetFormat] \n\tWITH ( FORMAT_TYPE = PARQUET)\nGO\n\nIF NOT EXISTS (SELECT * FROM sys.external_data_sources WHERE name = 'udacity-nycpayroll-thomas-m_udacitynycpayrollthomasm_dfs_core_windows_net') \n\tCREATE EXTERNAL DATA SOURCE [udacity-nycpayroll-thomas-m_udacitynycpayrollthomasm_dfs_core_windows_net] \n\tWITH (\n\t\tLOCATION = 'abfss://udacity-nycpayroll-thomas-m@udacitynycpayrollthomasm.dfs.core.windows.net' \n\t)\nGO\n\nCREATE EXTERNAL TABLE nyc_result (\n\t[AgencyName] nvarchar(4000),\n\t[FiscalYear] int,\n\t[TotalPaid] float\n\t)\n\tWITH (\n\tLOCATION = 'dirstaging',\n\tDATA_SOURCE = [udacity-nycpayroll-thomas-m_udacitynycpayrollthomasm_dfs_core_windows_net],\n\tFILE_FORMAT = [SynapseParquetFormat]\n\t)\nGO\n",
