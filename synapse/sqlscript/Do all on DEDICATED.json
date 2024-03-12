@@ -1,0 +1,17 @@
+{
+	"name": "Do all on DEDICATED",
+	"properties": {
+		"content": {
+			"query": "-- All steps for dedicated SQL pool\n\n\n-- USE udacitytemp\n-- GO\n\n-- Use the same file format as used for creating the External Tables during the LOAD step.\nIF NOT EXISTS (SELECT * FROM sys.external_file_formats WHERE name = 'SynapseDelimitedTextFormat') \nCREATE EXTERNAL FILE FORMAT [SynapseDelimitedTextFormat] \nWITH ( FORMAT_TYPE = DELIMITEDTEXT ,\nFORMAT_OPTIONS (\nFIELD_TERMINATOR = ',',\nUSE_TYPE_DEFAULT = FALSE\n))\nGO\n\n-- Create master key\nDROP EXTERNAL DATA SOURCE [NYC_Payroll_Summary_DEDICATED]\nGO\nDROP DATABASE SCOPED CREDENTIAL nyc_payroll\nGO\nDROP MASTER KEY \nGO\nCREATE MASTER KEY ENCRYPTION BY PASSWORD = 'udacity_pw_001'\n\nCREATE DATABASE SCOPED CREDENTIAL nyc_payroll_DEDICATED\nWITH IDENTITY = 'SHARED ACCESS SIGNATURE',\nSECRET = 'sp=r&st=2024-03-12T16:36:20Z&se=2024-03-13T00:36:20Z&spr=https&sv=2022-11-02&sr=c&sig=hRJ1EgNHRhwC64nGaALIJo9p4GUUxuNnqfybM6lYuxU%3D'\nGO\n\nCREATE EXTERNAL DATA SOURCE [NYC_Payroll_Summary_DEDICATED] WITH\n(\n\tLOCATION = 'https://udacitynycpayrollthomasm.blob.core.windows.net/udacity-nycpayroll-thomas-m',\n\tCREDENTIAL = nyc_payroll_DEDICATED\n)\n\nCREATE EXTERNAL TABLE [dbo].[NYC_Payroll_Summary_DEDICATED](\n    [FiscalYear] [int] NULL,\n    [AgencyName] [varchar](50) NULL,\n    [TotalPaid] [float] NULL\n)\nWITH (\n    LOCATION = '/dirstaging',\n    DATA_SOURCE = [NYC_Payroll_Summary_DEDICATED],\n    FILE_FORMAT = [SynapseDelimitedTextFormat]\n    )\nGO",
+			"metadata": {
+				"language": "sql"
+			},
+			"currentConnection": {
+				"databaseName": "udacitytemp",
+				"poolName": "udacitytemp"
+			},
+			"resultLimit": 5000
+		},
+		"type": "SqlQuery"
+	}
+}

@@ -2,7 +2,7 @@
 	"name": "Create external staging table NYC_Payroll_Summary",
 	"properties": {
 		"content": {
-			"query": "CREATE EXTERNAL TABLE [dbo].[NYC_Payroll_Summary](\n    [FiscalYear] [int] NULL,\n    [AgencyName] [varchar](50) NULL,\n    [TotalPaid] [float] NULL\n)\nWITH (\n    LOCATION = '/dirstaging',\n    DATA_SOURCE = [NYC_Payroll_Summary],\n    FILE_FORMAT = [SynapseDelimitedTextFormat]\n    )\nGO\n\n",
+			"query": "-- DROP EXTERNAL TABLE [dbo].[NYC_Payroll_Summary]\n-- GO\n\nCREATE EXTERNAL TABLE [udacitytemp].[dbo].[NYC_Payroll_Summary](\n    [FiscalYear] [int] NULL,\n    [AgencyName] [varchar](50) NULL,\n    [TotalPaid] [float] NULL\n)\nWITH (\n    LOCATION = '/dirstaging',\n    DATA_SOURCE = [NYC_Payroll_Summary],\n    FILE_FORMAT = [SynapseDelimitedTextFormat]\n    )\nGO\n\n",
 			"metadata": {
 				"language": "sql"
 			},
