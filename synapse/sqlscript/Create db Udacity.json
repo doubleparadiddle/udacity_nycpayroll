@@ -1,0 +1,17 @@
+{
+	"name": "Create db Udacity",
+	"properties": {
+		"content": {
+			"query": "CREATE DATABASE Udacity;",
+			"metadata": {
+				"language": "sql"
+			},
+			"currentConnection": {
+				"databaseName": "udacity",
+				"poolName": "Built-in"
+			},
+			"resultLimit": 5000
+		},
+		"type": "SqlQuery"
+	}
+}

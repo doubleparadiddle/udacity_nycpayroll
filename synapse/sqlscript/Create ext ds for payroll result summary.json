@@ -1,0 +1,17 @@
+{
+	"name": "Create ext ds for payroll result summary",
+	"properties": {
+		"content": {
+			"query": "USE udacity\nGO\n-- Create master key\nCREATE MASTER KEY ENCRYPTION BY PASSWORD = 'udacity_pw_001'\n\nCREATE DATABASE SCOPED CREDENTIAL nyc_payroll\nWITH IDENTITY = 'SHARED ACCESS SIGNATURE',\nSECRET = 'sp=racwdlme&st=2024-03-11T15:17:35Z&se=2024-03-11T23:17:35Z&sip=0.0.0.0&spr=https&sv=2022-11-02&sr=c&sig=E5vFXKHz1XZJeDwqsW3VS%2FWIE2%2FnyjscokL9crrifgg%3D'\nGO\n\nCREATE EXTERNAL DATA SOURCE [NYC_Payroll_Summary] WITH\n(\n\tLOCATION = 'https://udacitynycpayrollthomasm.blob.core.windows.net/udacity-nycpayroll-thomas-m',\n\tCREDENTIAL = nyc_payroll\n)\nhttps://udacitynycpayrollthomasm.blob.core.windows.net/udacity-nycpayroll-thomas-m",
+			"metadata": {
+				"language": "sql"
+			},
+			"currentConnection": {
+				"databaseName": "udacity",
+				"poolName": "Built-in"
+			},
+			"resultLimit": 5000
+		},
+		"type": "SqlQuery"
+	}
+}
